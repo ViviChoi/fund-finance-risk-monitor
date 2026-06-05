@@ -82,7 +82,7 @@ All numbers are **illustrative**, from this synthetic sample fund.
 
 ## Prefer a web page? (great for showing HR)
 
-Open **`fundfinance_webui.html`** by double-clicking it — it runs in any browser on Mac or
+Open **`index.html`** by double-clicking it — it runs in any browser on Mac or
 Windows, no install needed. Click **“Load built-in sample”** to see everything instantly, or
 **“Choose data folder…”** and pick the `sample_data` folder to load your own CSVs. Drag the
 sliders (advance rate, amount drawn, volatility) and watch the traffic lights and charts update
