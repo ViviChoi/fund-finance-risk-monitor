@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Fund Finance Facility Risk Monitor</title>
+<style>
+  :root{
+    --navy:#1F3864; --navy-dk:#16284A; --accent:#2E6FB0; --ice:#CADCFC;
+    --ink:#1A1A1A; --grey:#5A5A5A; --lgrey:#9AA3B0; --panel:#F4F7FB; --line:#DCE3EE;
+    --green:#27AE60; --amber:#E0A106; --red:#C0392B; --white:#FFFFFF;
+    --serif:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --sans:"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--white);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 26px 60px}
+  header h1{font-family:var(--serif);font-weight:700;color:var(--navy);font-size:30px;margin:0 0 4px}
+  header .sub{color:var(--grey);font-size:15px}
+  header .tag{display:inline-block;margin-top:8px;font-size:11px;letter-spacing:1px;font-weight:700;color:var(--accent)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-top:18px}
+  .card h2{font-family:var(--serif);font-size:18px;color:var(--ink);margin:0 0 12px;font-weight:700}
+  .muted{color:var(--grey);font-size:13px}
+  .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  button{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--white);background:var(--navy);
+    border:0;border-radius:7px;padding:10px 16px;cursor:pointer}
+  button:hover{background:var(--navy-dk)}
+  button.ghost{background:var(--white);color:var(--navy);border:1px solid var(--navy)}
+  .filebtn{position:relative;overflow:hidden;display:inline-block}
+  .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0}
+  #status{font-size:13px;color:var(--grey);margin-left:4px}
+  details{margin-top:10px}
+  summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:600}
+  .frow{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px}
+  .frow label{font-size:13px;color:var(--grey)}
+  .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .ctl label{display:block;font-size:13px;color:var(--grey);margin-bottom:4px}
+  .ctl .val{font-family:var(--serif);font-size:20px;color:var(--navy);font-weight:700}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--navy);border-radius:8px;padding:12px 12px}
+  .stat .n{font-family:var(--serif);font-weight:700;font-size:24px;color:var(--navy);line-height:1.1}
+  .stat .l{font-size:11.5px;color:var(--grey);margin-top:5px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:11px;letter-spacing:.5px;color:var(--lgrey);text-align:left;font-weight:700;padding:0 0 8px}
+  td{padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  td.r{text-align:right;color:var(--grey)}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  .banner{border-radius:8px;padding:14px 18px;font-size:15px;display:flex;align-items:center;gap:14px}
+  .banner .big{font-family:var(--serif);font-size:24px;font-weight:700}
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .chart h3{font-size:13px;color:var(--grey);margin:0 0 6px;font-weight:600}
+  .mc-track{height:22px;border-radius:11px;background:#EAEFF6;overflow:hidden;border:1px solid var(--line)}
+  .mc-fill{height:100%;background:var(--amber)}
+  .note{font-size:12px;color:var(--lgrey);font-style:italic;margin-top:10px}
+  .hidden{display:none}
+  @media(max-width:860px){.cards{grid-template-columns:repeat(2,1fr)}.controls{grid-template-columns:1fr}.grid2,.charts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fund Finance Facility Risk Monitor</h1>
+    <div class="sub">Import a fund, size the loan, watch the limits, and stress-test the result.</div>
+    <div class="tag">ILLUSTRATIVE — SYNTHETIC SAMPLE DATA</div>
+  </header>
+
+  <!-- IMPORT -->
+  <div class="card">
+    <h2>1 · Load data</h2>
+    <div class="toolbar">
+      <button id="btnSample">Load built-in sample</button>
+      <span class="filebtn ghost" style="padding:0">
+        <button class="ghost" type="button">Choose data folder…</button>
+        <input id="folder" type="file" webkitdirectory directory multiple/>
+      </span>
+      <span id="status">No data loaded yet.</span>
+    </div>
+    <details>
+      <summary>Or pick the three CSV files individually</summary>
+      <div class="frow">
+        <label>investors.csv <input id="fInv" type="file" accept=".csv"></label>
+        <label>assets.csv <input id="fAst" type="file" accept=".csv"></label>
+        <label>facility.csv <input id="fFac" type="file" accept=".csv"></label>
+      </div>
+      <div class="muted" style="margin-top:8px">Columns — investors: name, commitment, uncalled, rating · assets: name, sector, nav, liquidity_days · facility: kind, advance_rate, limit, drawn, cure_days</div>
+    </details>
+  </div>
+
+  <!-- everything below is hidden until data loads -->
+  <div id="app" class="hidden">
+
+    <div class="card">
+      <h2>2 · Try a scenario</h2>
+      <div class="controls">
+        <div class="ctl"><label>Advance rate / LTV cap</label><div class="val" id="vAdv">20%</div><input id="sAdv" type="range" min="5" max="50" step="1" value="20"></div>
+        <div class="ctl"><label>Amount drawn</label><div class="val" id="vDrawn">$30</div><input id="sDrawn" type="range" min="0" max="60" step="1" value="30"></div>
+        <div class="ctl"><label>Stress volatility</label><div class="val" id="vVol">15%</div><input id="sVol" type="range" min="5" max="40" step="1" value="15"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3 · Facility snapshot</h2>
+      <div class="cards" id="statCards"></div>
+      <div id="banner" class="banner" style="margin-top:16px"></div>
+    </div>
+
+    <div class="card">
+      <div class="grid2">
+        <div>
+          <h2>Limits (traffic lights)</h2>
+          <table id="covTable"><thead><tr><th style="width:60%">Limit</th><th class="r">Now vs rule</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div>
+          <h2>Investors</h2>
+          <table id="invTable"><thead><tr><th>Investor</th><th class="r">Rating</th><th class="r">Default odds</th><th class="r">Counts?</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4 · Stress test — what if values fall</h2>
+      <div class="charts">
+        <div class="chart"><h3>Headroom as values fall (crosses zero = trouble)</h3><div id="chartAvail"></div></div>
+        <div class="chart"><h3>Loan-to-value vs the 25% limit</h3><div id="chartLtv"></div></div>
+      </div>
+      <div id="breakNote" class="muted" style="margin-top:12px"></div>
+      <div style="margin-top:16px">
+        <div class="muted" style="margin-bottom:6px">Chance of a breach over the period (simulation)</div>
+        <div class="mc-track"><div id="mcFill" class="mc-fill" style="width:0%"></div></div>
+        <div id="mcText" class="muted" style="margin-top:6px"></div>
+      </div>
+      <div class="note">All figures are illustrative, computed from the synthetic sample fund. In a real deal, every parameter is negotiated per transaction.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ---------- model (identical formulas to the Python project) ---------- */
+const RATING_PD={AAA:0.001,AA:0.002,A:0.005,BBB:0.02,BB:0.06,B:0.12,CCC:0.25,NR:0.10};
+const MAX_PD=0.03, LP_CONC=0.25;
+const MAX_LTV=0.25, MAX_ASSET=0.35, MAX_SECTOR=0.40, MIN_ASSETS=4, UTIL_WARN=0.85, WARNF=0.90, MIN_LIQ=1.0;
+const pd=lp=> lp.pd!=null?lp.pd:(RATING_PD[lp.rating]??0.15);
+const eligible=lp=> pd(lp)<=MAX_PD;
+const liqFactor=a=> a.liquidity_days<=30?1.0:a.liquidity_days<=90?0.9:a.liquidity_days<=180?0.75:0.6;
+const totalNav=f=> f.assets.reduce((s,a)=>s+a.nav,0);
+const navBB=(f,fc)=> fc.advance_rate*f.assets.reduce((s,a)=>s+a.nav*liqFactor(a),0);
+function subBB(f,fc){const el=f.lps.filter(eligible).map(l=>l.uncalled);const t=el.reduce((s,v)=>s+v,0);if(!t)return 0;const cap=LP_CONC*t;return fc.advance_rate*el.reduce((s,v)=>s+Math.min(v,cap),0);}
+const bb=(f,fc)=> fc.kind==='subscription'?subBB(f,fc):navBB(f,fc);
+const effLimit=(f,fc)=> Math.min(bb(f,fc),fc.limit);
+const avail=(f,fc)=> effLimit(f,fc)-fc.drawn;
+const util=(f,fc)=>{const l=effLimit(f,fc);return l>0?fc.drawn/l:Infinity;};
+const ltv=(f,fc)=>{const n=totalNav(f);return n>0?fc.drawn/n:Infinity;};
+const liqCover=(f,fc,h=90)=>{if(fc.drawn<=0)return Infinity;const lv=f.assets.filter(a=>a.liquidity_days<=h).reduce((s,a)=>s+a.nav,0);return lv/fc.drawn;};
+function haircutFund(f,h){return {lps:f.lps,assets:f.assets.map(a=>({...a,nav:a.nav*(1-h)}))};}
+
+function covenants(f,fc){
+  const out=[];
+  const hi=(name,actual,limit,fmt)=>{let st=actual>limit?'RED':(actual>=WARNF*limit?'AMBER':'GREEN');out.push({name,st,txt:fmt(actual)+' vs '+fmt(limit)});};
+  // headroom
+  const a=avail(f,fc),lim=effLimit(f,fc);
+  let st=a<0?'RED':(lim>0&&a<(1-UTIL_WARN)*lim?'AMBER':'GREEN');
+  out.push({name:'Room left to borrow',st,txt:'$'+a.toFixed(0)+' vs >0'});
+  // utilization
+  const u=util(f,fc); st=u>1?'RED':(u>=UTIL_WARN?'AMBER':'GREEN');
+  out.push({name:'How much is used',st,txt:(100*u).toFixed(0)+'% vs <85%'});
+  // asset concentration
+  const nav=totalNav(f); const la=nav>0?Math.max(...f.assets.map(x=>x.nav))/nav:Infinity;
+  hi('Biggest single asset',la,MAX_ASSET,v=>(100*v).toFixed(0)+'%');
+  // ltv
+  hi('Loan vs value (LTV)',ltv(f,fc),MAX_LTV,v=>(100*v).toFixed(0)+'%');
+  // sector concentration
+  const sec={}; f.assets.forEach(x=>sec[x.sector]=(sec[x.sector]||0)+x.nav);
+  const ls=nav>0?Math.max(...Object.values(sec))/nav:Infinity;
+  hi('Biggest sector',ls,MAX_SECTOR,v=>(100*v).toFixed(0)+'%');
+  // liquidity coverage
+  const lc=liqCover(f,fc); st=lc<MIN_LIQ?'RED':(lc<2?'AMBER':'GREEN');
+  out.push({name:'Can we sell in time',st,txt:(isFinite(lc)?lc.toFixed(1)+'x':'—')+' vs >1x'});
+  // diversification
+  const n=f.assets.length; st=n>=MIN_ASSETS?'GREEN':'RED';
+  out.push({name:'Spread across enough assets',st,txt:n+' vs >='+MIN_ASSETS});
+  return out;
+}
+function triggerAction(cov){
+  const reds=cov.filter(c=>c.st==='RED'), ambers=cov.filter(c=>c.st==='AMBER');
+  if(reds.length) return {act:'MARGIN CALL',color:'var(--red)',reasons:reds};
+  if(ambers.length) return {act:'WARNING',color:'var(--amber)',reasons:ambers};
+  return {act:'MONITOR',color:'var(--green)',reasons:[]};
+}
+function firstBreach(f,fc){for(let h=0;h<=0.9;h+=0.005){const s=haircutFund(f,h);if(avail(s,fc)<0)return[h,'the borrowing base is breached (we must repay)'];if(ltv(s,fc)>MAX_LTV)return[h,'the LTV covenant breaks'];}return[null,null];}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(rng){let u=0,v=0;while(u===0)u=rng();while(v===0)v=rng();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function monteCarlo(f,fc,sigma,n=10000){const rng=mulberry32(42);let any=0,b=0,l=0;for(let i=0;i<n;i++){const shock=Math.exp(gauss(rng)*sigma);const s={lps:f.lps,assets:f.assets.map(a=>({...a,nav:a.nav*shock}))};const dd=avail(s,fc)<0,ll=ltv(s,fc)>MAX_LTV;if(dd)b++;if(ll)l++;if(dd||ll)any++;}return{pAny:any/n,pBB:b/n,pLTV:l/n};}
+
+/* ---------- CSV parsing ---------- */
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,'');
+  const lines=text.split(/\r?\n/).filter(l=>l.trim().length);
+  if(!lines.length) return [];
+  const head=lines[0].split(',').map(s=>s.trim());
+  return lines.slice(1).map(line=>{
+    const cells=line.split(',');
+    const o={}; head.forEach((h,i)=>o[h]=(cells[i]||'').trim());
+    return o;
+  });
+}
+const num=(x,d=0)=>{const v=parseFloat(x);return isNaN(v)?d:v;};
+function buildFund(inv,ast){
+  return {
+    lps: inv.filter(r=>r.name).map(r=>({name:r.name,commitment:num(r.commitment),uncalled:num(r.uncalled),rating:(r.rating||'NR').trim()})),
+    assets: ast.filter(r=>r.name).map(r=>({name:r.name,sector:(r.sector||'Other').trim(),nav:num(r.nav),liquidity_days:num(r.liquidity_days,30)}))
+  };
+}
+function buildFacility(rows){const r=rows[0]||{};return {kind:(r.kind||'nav').trim(),advance_rate:num(r.advance_rate,0.20),limit:num(r.limit,50),drawn:num(r.drawn,0),cure_days:num(r.cure_days,10)};}
+
+/* ---------- built-in sample ---------- */
+const SAMPLE={
+  investors:`name,commitment,uncalled,rating
+Pension Fund A,100,40,A
+Insurer B,80,30,AA
+Endowment C,50,20,BBB
+Family Office D,30,15,NR`,
+  assets:`name,sector,nav,liquidity_days
+TechCo,Technology,60,60
+HealthCo,Healthcare,40,90
+IndustrialCo,Industrials,35,120
+RetailCo,Consumer,25,45
+FinCo,Financials,30,30`,
+  facility:`kind,advance_rate,limit,drawn,cure_days
+nav,0.20,50,30,10`
+};
+
+/* ---------- state ---------- */
+let FUND=null, FAC=null;
+
+function setStatus(msg){document.getElementById('status').textContent=msg;}
+function loadFromStrings(invS,astS,facS,label){
+  FUND=buildFund(parseCSV(invS),parseCSV(astS));
+  FAC=buildFacility(parseCSV(facS));
+  document.getElementById('app').classList.remove('hidden');
+  // sync sliders to loaded facility
+  const sAdv=document.getElementById('sAdv'), sDrawn=document.getElementById('sDrawn');
+  sAdv.value=Math.round(FAC.advance_rate*100);
+  sDrawn.max=Math.max(60,Math.round(FAC.limit));
+  sDrawn.value=Math.round(FAC.drawn);
+  setStatus(label+'  ·  '+FUND.lps.length+' investors, '+FUND.assets.length+' assets');
+  render();
+}
+
+/* ---------- charts (inline SVG) ---------- */
+function lineChart(opts){
+  const W=opts.w||340,H=opts.h||230,pL=44,pR=14,pT=12,pB=30;
+  const xs=opts.xs, xmin=0, xmax=xs[xs.length-1];
+  let ymin=opts.ymin, ymax=opts.ymax;
+  const X=v=>pL+(v-xmin)/(xmax-xmin)*(W-pL-pR);
+  const Y=v=>H-pB-(v-ymin)/(ymax-ymin)*(H-pT-pB);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:'+W+'px">';
+  // shade below zero if asked and zero in range
+  if(opts.shadeBelowZero && ymin<0){
+    const y0=Y(0);
+    s+='<rect x="'+pL+'" y="'+y0+'" width="'+(W-pL-pR)+'" height="'+(H-pB-y0)+'" fill="#C0392B" opacity="0.07"/>';
+  }
+  // axes
+  s+='<line x1="'+pL+'" y1="'+(H-pB)+'" x2="'+(W-pR)+'" y2="'+(H-pB)+'" stroke="#C9D3E2"/>';
+  s+='<line x1="'+pL+'" y1="'+pT+'" x2="'+pL+'" y2="'+(H-pB)+'" stroke="#C9D3E2"/>';
+  // y ticks (3)
+  for(let i=0;i<=2;i++){const v=ymin+(ymax-ymin)*i/2;const y=Y(v);
+    s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="#EDF1F7"/>';
+    s+='<text x="'+(pL-6)+'" y="'+(y+4)+'" font-size="10" fill="#9AA3B0" text-anchor="end" font-family="Segoe UI,Helvetica,Arial,sans-serif">'+opts.yfmt(v)+'</text>';}
+  // x ticks (0,25,50)
+  [0,0.25,0.5].forEach(t=>{const x=X(t);s+='<text x="'+x+'" y="'+(H-pB+16)+'" font-size="10" fill="#9AA3B0" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif">'+(t*100)+'%</text>';});
+  s+='<text x="'+((pL+W-pR)/2)+'" y="'+(H-2)+'" font-size="10" fill="#9AA3B0" text-anchor="middle" font-family="Segoe UI,Helvetica,Arial,sans-serif">value drop</text>';
+  // markers (horizontal reference lines)
+  (opts.markers||[]).forEach(m=>{const y=Y(m.y);s+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="'+m.color+'" stroke-width="1.4" stroke-dasharray="5,4"/>';
+    s+='<text x="'+(W-pR)+'" y="'+(y-4)+'" font-size="10" fill="'+m.color+'" text-anchor="end" font-family="Segoe UI,Helvetica,Arial,sans-serif">'+m.label+'</text>';});
+  // series
+  opts.series.forEach(se=>{
+    let d=''; xs.forEach((x,i)=>{d+=(i?'L':'M')+X(x)+' '+Y(se.values[i])+' ';});
+    s+='<path d="'+d+'" fill="none" stroke="'+se.color+'" stroke-width="2.4"/>';
+  });
+  s+='</svg>';
+  return s;
+}
+
+/* ---------- render ---------- */
+function fnum(x,d=0){return (x<0?'-$':'$')+Math.abs(x).toFixed(d);}
+function render(){
+  if(!FUND||!FAC)return;
+  // apply slider overrides
+  const adv=+document.getElementById('sAdv').value/100;
+  const drawn=+document.getElementById('sDrawn').value;
+  const vol=+document.getElementById('sVol').value/100;
+  document.getElementById('vAdv').textContent=(adv*100).toFixed(0)+'%';
+  document.getElementById('vDrawn').textContent='$'+drawn;
+  document.getElementById('vVol').textContent=(vol*100).toFixed(0)+'%';
+  const fac={...FAC,advance_rate:adv,drawn:drawn};
+  const f=FUND;
+
+  // stat cards
+  const cards=[
+    [fnum(totalNav(f)),'portfolio value (NAV)','var(--navy)'],
+    [fnum(bb(f,fac),0),'borrowing base','var(--accent)'],
+    [fnum(fac.drawn),'drawn','var(--navy)'],
+    [(100*util(f,fac)).toFixed(0)+'%','utilization', util(f,fac)>=UTIL_WARN?'var(--amber)':'var(--navy)'],
+    [(100*ltv(f,fac)).toFixed(0)+'%','loan-to-value', ltv(f,fac)>MAX_LTV?'var(--red)':'var(--navy)'],
+    [fnum(avail(f,fac),0),'headroom left', avail(f,fac)<0?'var(--red)':(avail(f,fac)< (1-UTIL_WARN)*effLimit(f,fac)?'var(--amber)':'var(--green)')]
+  ];
+  document.getElementById('statCards').innerHTML=cards.map(c=>
+    '<div class="stat" style="border-left-color:'+c[2]+'"><div class="n" style="color:'+c[2]+'">'+c[0]+'</div><div class="l">'+c[1]+'</div></div>').join('');
+
+  // covenants + trigger
+  const cov=covenants(f,fac);
+  const colorOf={GREEN:'var(--green)',AMBER:'var(--amber)',RED:'var(--red)'};
+  document.querySelector('#covTable tbody').innerHTML=cov.map(c=>
+    '<tr><td><span class="dot" style="background:'+colorOf[c.st]+'"></span>'+c.name+'</td><td class="r">'+c.txt+'</td></tr>').join('');
+  const tr=triggerAction(cov);
+  document.getElementById('banner').style.background='var(--panel)';
+  document.getElementById('banner').style.border='2px solid '+tr.color;
+  const why=tr.reasons.length?(' — '+tr.reasons.map(r=>r.name).join(', ')):'';
+  document.getElementById('banner').innerHTML='<span style="font-size:11px;letter-spacing:1px;color:var(--grey);font-weight:700">WHAT THE TOOL SAYS</span><span class="big" style="color:'+tr.color+'">'+tr.act+'</span><span class="muted">'+why+'</span>';
+
+  // investors
+  document.querySelector('#invTable tbody').innerHTML=f.lps.map(l=>{
+    const ok=eligible(l);
+    return '<tr><td>'+l.name+'</td><td class="r">'+l.rating+'</td><td class="r">'+(100*pd(l)).toFixed(1)+'%</td><td class="r" style="color:'+(ok?'var(--green)':'var(--red)')+';font-weight:600">'+(ok?'yes':'no')+'</td></tr>';
+  }).join('');
+
+  // stress sweep
+  const xs=[]; for(let h=0;h<=0.5+1e-9;h+=0.025) xs.push(+h.toFixed(3));
+  const av=xs.map(h=>avail(haircutFund(f,h),fac));
+  const lv=xs.map(h=>100*ltv(haircutFund(f,h),fac));
+  const avMin=Math.min(...av,0), avMax=Math.max(...av,0);
+  document.getElementById('chartAvail').innerHTML=lineChart({xs,
+    series:[{values:av,color:'var(--accent)'}],
+    ymin:Math.floor(avMin-1), ymax:Math.ceil(avMax+1), shadeBelowZero:true,
+    markers:[{y:0,color:'#9AA3B0',label:'zero'}], yfmt:v=>'$'+v.toFixed(0)});
+  const lvMin=Math.min(...lv,25), lvMax=Math.max(...lv,25);
+  document.getElementById('chartLtv').innerHTML=lineChart({xs,
+    series:[{values:lv,color:'var(--navy)'}],
+    ymin:Math.floor(lvMin-2), ymax:Math.ceil(lvMax+2),
+    markers:[{y:25,color:'var(--red)',label:'25% limit'}], yfmt:v=>v.toFixed(0)+'%'});
+
+  // breaking point + monte carlo
+  const [h,why2]=firstBreach(f,fac);
+  document.getElementById('breakNote').innerHTML = h!=null
+    ? 'Breaking point: a value drop of <b>~'+(h*100).toFixed(0)+'%</b> is the point at which '+why2+'.'
+    : 'No breach within a 90% value drop.';
+  const mc=monteCarlo(f,fac,vol);
+  document.getElementById('mcFill').style.width=(mc.pAny*100).toFixed(0)+'%';
+  const level = mc.pAny>=0.5?'high':(mc.pAny>=0.15?'moderate':'low');
+  const oneIn = mc.pAny>0 ? ' (about 1 in '+Math.max(1,Math.round(1/mc.pAny))+')' : '';
+  document.getElementById('mcText').innerHTML='About <b>'+(mc.pAny*100).toFixed(0)+'%</b>'+oneIn+' — a '+level+' chance of a breach at '+(vol*100).toFixed(0)+'% volatility.';
+}
+
+/* ---------- wire up ---------- */
+document.getElementById('btnSample').onclick=()=>loadFromStrings(SAMPLE.investors,SAMPLE.assets,SAMPLE.facility,'Built-in sample loaded');
+['sAdv','sDrawn','sVol'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+
+function readFile(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsText(file);});}
+async function tryIndividual(){
+  const inv=document.getElementById('fInv').files[0], ast=document.getElementById('fAst').files[0], fac=document.getElementById('fFac').files[0];
+  if(inv&&ast&&fac){const[a,b,c]=await Promise.all([readFile(inv),readFile(ast),readFile(fac)]);loadFromStrings(a,b,c,'Imported your CSV files');}
+  else setStatus('Pick all three CSV files (investors, assets, facility).');
+}
+['fInv','fAst','fFac'].forEach(id=>document.getElementById(id).addEventListener('change',tryIndividual));
+
+document.getElementById('folder').addEventListener('change',async e=>{
+  const files=[...e.target.files];
+  const find=n=>files.find(f=>f.name.toLowerCase()===n);
+  const inv=find('investors.csv'),ast=find('assets.csv'),fac=find('facility.csv');
+  if(inv&&ast&&fac){const[a,b,c]=await Promise.all([readFile(inv),readFile(ast),readFile(fac)]);loadFromStrings(a,b,c,'Imported folder: '+(e.target.files[0].webkitRelativePath||'').split('/')[0]);}
+  else setStatus('That folder needs investors.csv, assets.csv and facility.csv.');
+});
+</script>
+</body>
+</html>

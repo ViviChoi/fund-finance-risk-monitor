@@ -1,0 +1,33 @@
+# Local working notes — not part of the public distribution
+_private/
+
+# Local Python environment — recreated by the double-click launchers
+.venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Pytest cache
+.pytest_cache/
+
+# macOS noise
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Build / packaging
+build/
+dist/
+*.egg
+
+# Notes: generated outputs (figures/*.png, slides/FFRM-Deck.pptx) are
+# kept under version control so anyone reading the repo can see what
+# the deliverables look like without having to run the launcher first.

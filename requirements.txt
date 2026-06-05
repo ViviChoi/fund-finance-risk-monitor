@@ -1,0 +1,12 @@
+# Core engine runs on the Python standard library alone (degraded mode).
+# These packages enable the full functionality:
+#
+#   numpy        -> vectorised multi-factor Monte Carlo (~100x faster).
+#                   Without it, a single-shock stdlib fallback is used.
+#   matplotlib   -> the two PNG stress charts.
+#   python-pptx  -> the 12-slide deck generator (build_deck.py).
+#
+# The double-click launchers (启动报告 / 生成PPT) install these automatically.
+numpy>=1.24
+matplotlib>=3.5
+python-pptx>=1.0

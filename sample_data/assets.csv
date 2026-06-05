@@ -1,0 +1,6 @@
+name,sector,nav,liquidity_days
+TechCo,Technology,60,60
+HealthCo,Healthcare,40,90
+IndustrialCo,Industrials,35,120
+RetailCo,Consumer,25,45
+FinCo,Financials,30,30
