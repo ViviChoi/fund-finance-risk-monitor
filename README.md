@@ -1,5 +1,14 @@
 # Fund Finance Facility Risk Monitor
 
+**▶ Try it live (no install):** **<https://vivichoi.github.io/fund-finance-risk-monitor/>**
+
+> Open in any browser, click **Load built-in sample**, and drive the engine with
+> sliders — advance rate, drawn amount, NAV haircut — to watch the traffic-light
+> covenants flip and the binding constraint shift. Mobile and desktop. Zero
+> install. Same engine the Python CLI runs.
+
+---
+
 A small, self-contained Python project that simulates a **bank lending to a
 private fund** and monitors the risk of that loan — how much can be safely
 lent, where the binding constraint actually is, and what happens to the
